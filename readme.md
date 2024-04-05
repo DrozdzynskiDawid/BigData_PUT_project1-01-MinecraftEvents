@@ -96,8 +96,9 @@ Wyniki powinny zawierać następujące kolumny:
 - `amount3` - wielkość wydobycia w trzecim zdarzeniu
 
 ## Zadanie 7
-Trzy wydobycia trzech różnych surowców są określane przez graczy Big3. 
+Trzy kolejne wydobycia trzech różnych surowców są określane przez graczy Big3. 
 Znajduj przypadki wystąpienia dwóch następujących po sobie Big3. 
+Każde wydobycie może należeć tylko i wyłącznie do jednego Big3.
 
 Wyniki powinny zawierać, następujące kolumny:
 - `startIts` - moment rejestracji pierwszego zdarzenia z pierwszego Big3
