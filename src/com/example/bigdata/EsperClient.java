@@ -82,10 +82,87 @@ public class EsperClient {
         EPCompiler compiler = EPCompilerProvider.getCompiler();
         EPCompiled epCompiled;
         try {
+//          PRZYKŁAD
+//            epCompiled = compiler.compile("""
+//                    @public @buseventtype create json schema MinecraftEvent(ore string, depth int, amount int, ets string, its string);
+//                    @name('answer') SELECT ore, depth, amount, ets, its
+//                          from MinecraftEvent#ext_timed(java.sql.Timestamp.valueOf(its).getTime(), 3 sec)""", compilerArgs);
+// ZADANIE 1:
+//   epCompiled = compiler.compile("""
+//                    @public @buseventtype create json schema MinecraftEvent(ore string, depth int, amount int, ets string, its string);
+//                    @name('answer') SELECT ore, sum(amount) as sumAmount
+//                          from MinecraftEvent#ext_timed(java.sql.Timestamp.valueOf(its).getTime(), 60 sec)
+//                          group by ore;""", compilerArgs);
+// ZADANIE 2:
+//   epCompiled = compiler.compile("""
+//                    @public @buseventtype create json schema MinecraftEvent(ore string, depth int, amount int, ets string, its string);
+//                    @name('answer') SELECT depth, amount, ets, its
+//                          from MinecraftEvent(ore = 'diamond' and amount > 6 and depth > 12)#length(1);""", compilerArgs);
+// ZADANIE 3
+//            epCompiled = compiler.compile("""
+//                    @public @buseventtype create json schema MinecraftEvent(ore string, depth int, amount int, ets string, its string);
+//                    @name('answer') SELECT ore, depth, amount, ets, its
+//                             FROM MinecraftEvent#length(1) as m
+//                             where amount / (SELECT avg(amount)
+//                                  from MinecraftEvent#ext_timed(java.sql.Timestamp.valueOf(its).getTime(), 60 sec)
+//                                  where ore = m.ore
+//                                  group by ore) >= 1.5;""", compilerArgs);
+            // ZADANIE 4
+//            epCompiled = compiler.compile("""
+//                    @public @buseventtype create json schema MinecraftEvent(ore string, depth int, amount int, ets string, its string);
+//
+//                    @name('answer') SELECT hell.ore as ore, sum(heaven.amount) as sumAmountHeaven, sum(hell.amount) as sumAmountHell
+//                                      from MinecraftEvent(depth < 10)#ext_timed(java.sql.Timestamp.valueOf(its).getTime(), 60 sec) as hell
+//                                      join MinecraftEvent(depth > 20)#ext_timed(java.sql.Timestamp.valueOf(its).getTime(), 60 sec) as heaven
+//                                      on heaven.ore = hell.ore
+//                                      group by hell.ore;
+//                                        """, compilerArgs);
+            // ZADANIE 5
             epCompiled = compiler.compile("""
                     @public @buseventtype create json schema MinecraftEvent(ore string, depth int, amount int, ets string, its string);
-                    @name('answer') SELECT ore, depth, amount, ets, its
-                          from MinecraftEvent#ext_timed(java.sql.Timestamp.valueOf(its).getTime(), 3 sec)""", compilerArgs);
+
+                    @name('answer') select s[0].ore as ore, s[0].depth as depth, s[0].amount as amount,
+                                 s[0].ets as startEts, e.ets as endEts from
+                                 pattern[ every (s=MinecraftEvent until e=MinecraftEvent(amount > 5 and ore = 'diamond')
+                                 where timer:within(30 seconds))];""", compilerArgs);
+
+            // ZADANIE 6
+//                        epCompiled = compiler.compile("""
+//                    @public @buseventtype create json schema MinecraftEvent(ore string, depth int, amount int, ets string, its string);
+//
+//                    @name('answer') select * from MinecraftEvent
+//                                                    match_recognize (
+//                                                    measures
+//                                                        a.ore as ore,
+//                                                        a.amount as amount1,
+//                                                        b.amount as amount2,
+//                                                        c.amount as amount3
+//                                                    pattern ( a b c )
+//                                                    define
+//                                                         a as a.amount > 5,
+//                                                         b as b.amount > a.amount and b.ore = a.ore,
+//                                                         c as c.amount > b.amount and c.ore = a.ore
+//                                                    )""", compilerArgs);
+
+// ZADANIE 7
+//            epCompiled = compiler.compile("""
+//                    @public @buseventtype create json schema MinecraftEvent(ore string, depth int, amount int, ets string, its string);
+//
+//                                @name('answer') select *
+//                                    from MinecraftEvent
+//                                    match_recognize (
+//                                    measures
+//                                        f1.amount + f2.amount + f3.amount + s1.amount + s2.amount + s3.amount as sumAmount,
+//                                        f1.its as startIts,
+//                                        s3.its as endIts
+//                                    pattern (f1 f2 f3 s1 s2 s3)
+//                                    define
+//                                        f2 as f2.ore != f1.ore,
+//                                        f3 as (f3.ore != f2.ore and f3.ore != f1.ore),
+//                                        s2 as s2.ore != s1.ore,
+//                                        s3 as (s3.ore != s2.ore and s3.ore != s1.ore)
+//                                    )""", compilerArgs);
+
         }
         catch (EPCompileException ex) {
             // handle exception here
