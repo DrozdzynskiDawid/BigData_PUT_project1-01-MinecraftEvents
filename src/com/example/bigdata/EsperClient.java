@@ -23,8 +23,8 @@ public class EsperClient {
         int howLongInSec;
 
         if (args.length < 2) {
-            noOfRecordsPerSec = 2;
-            howLongInSec = 5;
+            noOfRecordsPerSec = 5;
+            howLongInSec = 20;
         } else {
             noOfRecordsPerSec = Integer.parseInt(args[0]);
             howLongInSec = Integer.parseInt(args[1]);
@@ -118,13 +118,32 @@ public class EsperClient {
 //                                      group by hell.ore;
 //                                        """, compilerArgs);
             // ZADANIE 5
+//            epCompiled = compiler.compile("""
+//                    @public @buseventtype create json schema MinecraftEvent(ore string, depth int, amount int, ets string, its string);
+//
+//                    @name('answer') select s[0].ore as ore, s[0].depth as depth, s[0].amount as amount,
+//                                 s[0].ets as startEts, e.ets as endEts from
+//                                 pattern[ every (s=MinecraftEvent until e=MinecraftEvent(amount > 5 and ore = 'diamond')
+//                                 where timer:within(30 seconds))];""", compilerArgs);
+
+
             epCompiled = compiler.compile("""
                     @public @buseventtype create json schema MinecraftEvent(ore string, depth int, amount int, ets string, its string);
 
-                    @name('answer') select s[0].ore as ore, s[0].depth as depth, s[0].amount as amount,
-                                 s[0].ets as startEts, e.ets as endEts from
-                                 pattern[ every (s=MinecraftEvent until e=MinecraftEvent(amount > 5 and ore = 'diamond')
-                                 where timer:within(30 seconds))];""", compilerArgs);
+                    @name('answer') select * from
+                                 MinecraftEvent()#ext_timed(java.sql.Timestamp.valueOf(its).getTime(), 30 sec)
+                                 match_recognize (
+                                    measures
+                                        x[0].ore as ore,
+                                        x[0].depth as depth,
+                                        x[0].amount as amount,
+                                        x[0].ets as startEts,
+                                        diamond.ets as endEts
+                                    after match skip past last row
+                                    pattern (x+ diamond)
+                                    define
+                                         diamond as diamond.amount > 5 and diamond.ore = 'diamond'
+                                    );""", compilerArgs);
 
             // ZADANIE 6
 //                        epCompiled = compiler.compile("""
