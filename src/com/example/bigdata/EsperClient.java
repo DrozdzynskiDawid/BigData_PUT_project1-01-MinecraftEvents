@@ -111,12 +111,15 @@ public class EsperClient {
 //            epCompiled = compiler.compile("""
 //                    @public @buseventtype create json schema MinecraftEvent(ore string, depth int, amount int, ets string, its string);
 //
-//                    @name('answer') SELECT hell.ore as ore, sum(heaven.amount) as sumAmountHeaven, sum(hell.amount) as sumAmountHell
-//                                      from MinecraftEvent(depth < 10)#ext_timed(java.sql.Timestamp.valueOf(its).getTime(), 60 sec) as hell
-//                                      join MinecraftEvent(depth > 20)#ext_timed(java.sql.Timestamp.valueOf(its).getTime(), 60 sec) as heaven
-//                                      on heaven.ore = hell.ore
-//                                      group by hell.ore;
-//                                        """, compilerArgs);
+//                    @name('answer')
+//                    SELECT ore,
+//                           sum(case when depth < 10 then amount else 0 end) as sumAmountHeaven,
+//                           sum(case when depth > 20 then amount else 0 end) as sumAmountHell
+//                    FROM MinecraftEvent#ext_timed(java.sql.Timestamp.valueOf(its).getTime(), 60 sec)
+//                    WHERE depth < 10 OR depth > 20
+//                    GROUP BY ore;
+//                """, compilerArgs);
+
             // ZADANIE 5
 //            epCompiled = compiler.compile("""
 //                    @public @buseventtype create json schema MinecraftEvent(ore string, depth int, amount int, ets string, its string);
