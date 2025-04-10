@@ -121,15 +121,6 @@ public class EsperClient {
 //                """, compilerArgs);
 
             // ZADANIE 5
-//            epCompiled = compiler.compile("""
-//                    @public @buseventtype create json schema MinecraftEvent(ore string, depth int, amount int, ets string, its string);
-//
-//                    @name('answer') select s[0].ore as ore, s[0].depth as depth, s[0].amount as amount,
-//                                 s[0].ets as startEts, e.ets as endEts from
-//                                 pattern[ every (s=MinecraftEvent until e=MinecraftEvent(amount > 5 and ore = 'diamond')
-//                                 where timer:within(30 seconds))];""", compilerArgs);
-
-
             epCompiled = compiler.compile("""
                     @public @buseventtype create json schema MinecraftEvent(ore string, depth int, amount int, ets string, its string);
 
